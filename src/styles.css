@@ -8,3 +8,12 @@
 html {
     color:rgb(48, 41, 47);
 }
+
+nav {
+  position: sticky;
+  left: 0;
+  top: 0;
+  height: 80px;
+  background: #f4f4f8ff;
+
+}
