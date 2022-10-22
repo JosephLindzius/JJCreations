@@ -1,5 +1,5 @@
 import React from "react";
-import { StyledButton, StyledText, Header6, StyledFooter } from "../Styled/Styled";
+import { StyledButton, StyledText, Header6, StyledFooter } from "./Styled/Styled";
 
 function SupportButton (){
   return <StyledButton>Support</StyledButton>
