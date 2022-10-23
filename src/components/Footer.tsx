@@ -5,7 +5,7 @@ import { StyledButton, StyledText, Header6, StyledFooter, Wrapper, Colors } from
 function SupportButton (){
   return <StyledButton>Support</StyledButton>
 }
-export default function Footer() {
+export default function Footer(): JSX.Element {
   return (
     <StyledFooter>
       <SupportButton/>

@@ -1,0 +1,13 @@
+{
+    "short_name": "JJ Creations",
+    "name": "JJ Creations",
+    "icons": [
+      {
+        "src": "favicon.svg",
+        "sizes": "192x192",
+        "type": "xml/svg"
+      }
+    ],
+    "start_url": "./index.html",
+    "display": "standalone"
+  }

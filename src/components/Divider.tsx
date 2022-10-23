@@ -4,7 +4,7 @@ import { StyledDivider } from "./Styled/Styled";
 interface IDividerProps {
     size: string;
 }
-export default function Divider({size}: IDividerProps){
+export default function Divider({size}: IDividerProps): JSX.Element {
     return(
         <StyledDivider size={size} />
     )
