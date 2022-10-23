@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Three.js and Fragment Shaders</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            border-box: box-sizing;
+        }
+
+        #info {
+            position: absolute;
+            bottom: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            width: 50%;
+            text-align: center;
+            z-index: 100;
+            background: #e6e6eaff;
+            padding: 1em;
+            border: 0;
+            box-shadow: 0 0 1px 2px #e6e6eaff;
+            border-radius: 4px;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+        }
+
+        #info:hover {
+            transition: 0.4s;
+            background-color: #fed766ff;
+        }
+
+        #info:active{
+            transition: 0.1s ease-in;
+            background-color: #fed766ff;
+            transform: translateY(1px);
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: white;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+        }
+
+    </style>
+    <button id="info">Start/stop music</button>
+    <div id="score">0</div>
+</head>
+<body>
+
+<script src="js/three.js"></script>
+<script src="js/cannon.js"></script>
+
+<script>
+    class GameObject {
+
+        boxGeo = new THREE.BoxGeometry(7, 7, 7, 7, 7, 7);
+        boxMat = new THREE.ShaderMaterial({
+            color: 0xff0000,
+            wireframe: true,
+            uniforms: uniformData,
+            vertexShader: `
+        varying vec3 pos;
+        uniform float u_time;
+
+        void main(){
+          vec4 result;
+          pos = position;
+
+          result = vec4(0.0+position.x, 8.0*sin(position.z/6.0 + u_time) + (position.y/5.0), position.z*1.5+(abs(position.x/2.0)), 1.0);
+
+          gl_Position = projectionMatrix * modelViewMatrix * result;
+        }
+        `,
+            fragmentShader: `
+        varying vec3 pos;
+        uniform float u_time;
+
+        void main() {
+                 gl_FragColor = vec4(abs(cos(u_time)), 0.0, abs(cos(u_time))-abs(sin(pos.z)), 1.0);
+        }
+        `
+        });
+
+        boxMesh = new THREE.Mesh(this.boxGeo, this.boxMat);
+
+        constructor(i) {
+            this.boxMesh.position.x = i*20;
+            return this.boxMesh
+        }
+
+
+
+
+
+    }
+    let score = 0;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    const renderer = new THREE.WebGLRenderer({alpha: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor( 0x000000, 0);
+    document.body.appendChild(renderer.domElement);
+
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2()
+    document.addEventListener('click', onDocumentMouseMove, false);
+    document.getElementById("info").addEventListener('click', onButtonClick, false);
+    //document.addEventListener('ontouchstart', onDocumentMouseMove, false);
+    window.addEventListener('resize', onWindowResize, false);
+    document.addEventListener('mousedown', onMouseDown, false);
+
+
+    const listener = new THREE.AudioListener();
+    camera.add( listener );
+
+    // create a global audio source
+    const sound = new THREE.Audio( listener );
+
+    // load a sound and set it as the Audio object's buffer
+    const audioLoader = new THREE.AudioLoader();
+
+    function stopSound(sound){
+            if(sound.isPlaying){
+                    sound.stop();
+                    document.getElementById("stopMusic").remove();
+            }
+        }
+
+    function onButtonClick(event) {
+        if(!sound.isPlaying){
+            audioLoader.load( 'sounds/Disappointed-Space.ogg', function( buffer ) {
+                sound.setBuffer( buffer );
+                sound.setVolume( 0.50 );
+                sound.play();
+            })
+        } 
+
+        if(sound.isPlaying){
+            sound.stop();
+        } 
+
+        event.preventDefault();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+
+    function onDocumentMouseMove(event) {
+        event.preventDefault();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    function onWindowResize() {
+
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function manageRaycasterIntersections(scene, camera) {
+        camera.updateMatrixWorld();
+        raycaster.setFromCamera(mouse, camera);
+        var intersects = raycaster.intersectObjects(scene.children);
+
+        if (intersects.length > 0) {
+            for (let i = 0; i < intersects.length; i++){
+                console.log(intersects[i].object)
+                scene.remove(intersects[i].object)
+                score++;
+                document.getElementById("score").innerText = score;
+            }
+        }
+        else {
+            
+        }
+    }
+
+    function reSpawn(){
+        let gameObjects = [];
+    for(let i = 0; i < 1; i++){
+        const boxMesh = new GameObject(i, clock);
+        boxMesh.position.y = 2;
+        gameObjects.push(boxMesh)
+        scene.add(boxMesh)
+    }
+
+
+    const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+    const sphereMesh2 = new THREE.Mesh(sphereGeo, sphereMat);
+    scene.add(sphereMesh)
+    scene.add(sphereMesh2)
+
+    sphereMesh.position.x = 8;
+    sphereMesh.position.y = 8;
+    sphereMesh2.position.x = -8;
+    sphereMesh2.position.y = 8;
+    sphereMesh.position.z = -8;
+    sphereMesh2.position.z = -8;
+
+    camera.position.z = 48;
+    camera.position.y = -10;
+
+    scene.rotateX(2)
+    gameObjects.forEach((el)=>{
+        el.position.y += 0;
+        el.position.z = 9;
+    });
+    }
+
+    function onMouseDown(event){
+        manageRaycasterIntersections(scene, camera)
+        console.log("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
+    }
+
+    //const axesHelper = new THREE.AxesHelper(16);
+    //scene.add(axesHelper);
+
+    const clock = new THREE.Clock();
+    const uniformData = {
+        u_time: {
+            type: 'f',
+            value: clock.getElapsedTime(),
+        }
+    };
+
+
+    const sphereGeo = new THREE.DodecahedronBufferGeometry(5, 5, 5);
+    const sphereMat = new THREE.ShaderMaterial({
+        color: 0xff0000,
+        wireframe: true,
+        uniforms: uniformData,
+        vertexShader: `
+        varying vec3 pos;
+        uniform float u_time;
+
+        void main(){
+          vec4 result;
+          pos = position;
+
+          result = vec4(0.0+position.x, 8.0*sin(position.z/6.0 + u_time) + (position.y/5.0), position.z*1.5+(abs(position.x/2.0)), 1.0);
+
+          gl_Position = projectionMatrix * modelViewMatrix * result;
+        }
+        `,
+        fragmentShader: `
+        varying vec3 pos;
+        uniform float u_time;
+
+        void main() {
+                 gl_FragColor = vec4(0.5+abs(cos(u_time))+pos.z, 0.5+(abs(cos(u_time))-abs(sin(pos.x))), sin(u_time), 1.0);
+        }
+        `
+    });
+    const OBJECT_MAX = 20
+    let gameObjects = [];
+    for(let i = 0; i < 1; i++){
+        const boxMesh = new GameObject(i, clock);
+        boxMesh.position.y = 2;
+        gameObjects.push(boxMesh)
+        scene.add(boxMesh)
+    }
+
+
+    const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+    const sphereMesh2 = new THREE.Mesh(sphereGeo, sphereMat);
+    scene.add(sphereMesh)
+    scene.add(sphereMesh2)
+
+    sphereMesh.position.x = 8;
+    sphereMesh.position.y = 8;
+    sphereMesh2.position.x = -8;
+    sphereMesh2.position.y = 8;
+    sphereMesh.position.z = -8;
+    sphereMesh2.position.z = -8;
+
+    camera.position.z = 48;
+
+    scene.rotateX(2)
+    gameObjects.forEach((el)=>{
+        el.position.y += 0;
+        el.position.z = 9;
+    });
+
+
+    function animate() {
+        uniformData.u_time.value = clock.getElapsedTime()
+        requestAnimationFrame(animate);
+
+        sphereMesh.rotation.x += .01
+        sphereMesh2.rotation.x += .01
+        sphereMesh2.rotation.y += Math.random()*0.01
+        sphereMesh.rotation.z += .0001
+
+        gameObjects.forEach((el)=>{
+          el.rotateZ += -Math.sin(clock.getElapsedTime())
+        });
+
+        if(scene.children.length == 0){
+            reSpawn();
+        }
+        renderer.render(scene, camera);
+    }
+
+    animate();
+</script>
+</body>
+</html>

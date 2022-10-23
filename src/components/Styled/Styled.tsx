@@ -31,12 +31,13 @@ interface IStyledDivider {
   size: string;
 }
 
-export const StyledDivider = styled.div<IStyledDivider>`
+export const StyledDivider = styled.hr<IStyledDivider>`
   height: ${(p) => {
     if (p.size == "large") return '5rem;'
-    return '0.5rem';
+    return '0.2rem';
   }};
   margin: 0.1rem 0 0.5rem 0;
+  border: none;
   background-color: ${Colors.tartOrange}
 `
 export const StyledMain = styled.main`
@@ -70,11 +71,14 @@ export const Header3 = styled.h3`
 `;
 
 export const StyledPageHeader = styled.header`
-  margin: 1rem 1rem 2rem 1rem;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 2rem 1rem 4rem 1rem;
 `;
 
 export const StyledCard = styled.section`
-  margin: 0.5rem;
+
   padding: 1rem;
   background-color: ${Colors.ghostWhite};
   border-radius: 2px;
@@ -122,7 +126,7 @@ export const Wrapper = styled.section<IWrapper>`
 `;
 
 export const StyledText = styled.p`
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 1rem;
 `;
 
 export const StyledListItem = styled.li`
