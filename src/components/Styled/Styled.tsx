@@ -3,11 +3,13 @@ import styled from "styled-components";
 export type TColors = {
   tartOrange: string;
   pacificBlue:string;
+  metallicSeaweed: string
   orangeYellowCrayola: string;
   gainsBoro: string;
   ghostWhite: string;
   raisinBlack: string;
   deepJungleGreen: string;
+  oliveGreen: string;
 };
 
 export const Colors: TColors = {
@@ -17,21 +19,43 @@ export const Colors: TColors = {
   gainsBoro: "#e6e6eaff",
   ghostWhite: "#f4f4f8ff",
   raisinBlack: "#30292f",
-  deepJungleGreen: "#08605f"
+  deepJungleGreen: "#08605f",
+  metallicSeaweed: "#177e89",
+  oliveGreen: "#a2ad59"
 }
 
 export const Container = styled.div`
-  height: 100%;
-  width: 100%;
-  background: ${Colors.gainsBoro};
+ 
+`
+interface IStyledDivider {
+  size: string;
+}
+
+export const StyledDivider = styled.div<IStyledDivider>`
+  height: ${(p) => {
+    if (p.size == "large") return '5rem;'
+    return '0.5rem';
+  }};
+  margin: 0.1rem 0 0.5rem 0;
+  background-color: ${Colors.tartOrange}
 `
 export const StyledMain = styled.main`
   display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-gap: 5rem; 
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-gap: 2rem; 
   width: 100%; 
-padding: 2rem;
+  padding: 2rem;
 `
+export const StyledNavigation = styled.nav`
+  position: sticky;
+  left: 0;
+  top: 0;
+  display: flex;
+  height: 80px;
+  padding: 0.5rem;
+  background: ${Colors.gainsBoro};
+  border-bottom: solid 1px ${Colors.pacificBlue};
+` 
 
 export const Header1 = styled.h1`
   font-size: 2.5rem;
@@ -41,23 +65,27 @@ export const Header2 = styled.h2`
  
 `;
 
+export const Header3 = styled.h3`
+ 
+`;
+
 export const StyledPageHeader = styled.header`
-  margin: 2.5rem 0 2.5rem; 1rem;
+  margin: 1rem 1rem 2rem 1rem;
 `;
 
 export const StyledCard = styled.section`
   margin: 0.5rem;
   padding: 1rem;
-  background: ${Colors.ghostWhite};
+  background-color: ${Colors.ghostWhite};
   border-radius: 2px;
   height: auto;
-  border: 1px solid ${Colors.pacificBlue}; 
-`
+  max-width: 300px;
+  border: 1px solid ${Colors.pacificBlue};`
 
 export const StyledFooter = styled.footer`
   width: 100%;
-  background-color: ${Colors.pacificBlue};
-  text-align: center;
+  background-color: ${Colors.oliveGreen};
+  padding: 1rem;
 `;
 
 
@@ -81,20 +109,36 @@ export const StyledButton = styled.button`
 
 export const Header6 = styled.h6`
   font-size: 1em;
-  text-align: center;
 `;
 
-export const Wrapper = styled.section`
+interface IWrapper {
+  bgColor: string
+}
+export const Wrapper = styled.section<IWrapper>`
   display: flex;
-  justify-content: center;
+  gap: 10px;
   width: auto;
-  background: ${Colors.deepJungleGreen};
+  background-color: ${p => p.bgColor};
 `;
 
 export const StyledText = styled.p`
-
+  margin: 0.5rem 0;
 `;
 
 export const StyledListItem = styled.li`
 list-style: none;
+`
+
+export const BrandDiv = styled.div`
+  flex-grow: 1;
+`
+interface IStyledImage {
+  boxShadow: boolean;
+}
+export const StyledImage = styled.img<IStyledImage>`
+  box-shadow: ${(p)=> {
+    if (p.boxShadow){return `60px 30px 1px 4px ${Colors.gainsBoro}`}}};
+    margin-bottom: ${(p)=> {
+      if (p.boxShadow){return `30px;`}}};
+      
 `

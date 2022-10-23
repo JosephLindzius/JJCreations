@@ -1,11 +1,19 @@
 import React from "react";
-import { Header1, Header2, StyledPageHeader } from "./Styled/Styled";
+import Divider from "./Divider";
+import { Header1, Header2, StyledPageHeader, StyledText } from "./Styled/Styled";
 
-export default function PageHeader (){
+interface IPageHeader {
+    headerTitle: string;
+    headerSubtitle: string;
+    text: string;
+}
+export default function PageHeader ({headerTitle, headerSubtitle, text}: IPageHeader){
     return (
     <StyledPageHeader>
-        <Header1>Welcome to JJ Creations</Header1>
-        <Header2>Where creativity thrives</Header2>
+        <Header1>{headerTitle}</Header1>
+        <Header2>{headerSubtitle}</Header2>
+        <Divider size={""} />
+        <StyledText>{text}</StyledText>
     </StyledPageHeader>
     )
 }
